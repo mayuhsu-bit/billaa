@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本行：網址分享分帳系統</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #e74c3c; --success: #27ae60; --info: #3498db; --light: #ecf0f1; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: #f4f7f6; margin: 0; padding: 15px; color: var(--primary); }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        .name-settings { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 15px; border: 1px dashed #ccc; }
+        .rate-box { background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border: 1px solid #ffeeba; }
+        .rate-box input { width: 65px; text-align: center; font-weight: bold; border-radius: 4px; border: 1px solid #ccc; padding: 5px; }
+
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
+        
+        .currency-selector { display: flex; gap: 5px; margin-bottom: 15px; }
+        .currency-selector button { flex: 1; padding: 10px; background: #eee; color: #666; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .currency-selector button.active { background: var(--info); color: white; }
+
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .person-input { background: #ffffff; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #eee; position: relative; }
+        .person-input.active { border-color: var(--success); background: #f1f9f5; }
+        .person-input span { font-size: 0.85rem; color: #555; display: block; margin-bottom: 8px; font-weight: bold; }
+
+        .check-container { display: flex; align-items: center; justify-content: center; margin-bottom: 5px; cursor: pointer; }
+        .check-container input { width: 18px; height: 18px; margin-right: 5px; cursor: pointer; }
+
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; margin-top: 10px; }
+        button.add-btn { background: var(--success); padding: 16px; font-size: 17px; margin-top: 20px; }
+        
+        .result-card { background: #f0f9ff; padding: 18px; border-radius: 12px; margin-top: 25px; border-left: 6px solid var(--info); }
+        .twd-amount { color: var(--accent); font-size: 1.2rem; font-weight: bold; }
+
+        .history-item { background: white; border: 1px solid #eee; padding: 12px; border-radius: 10px; margin-top: 10px; position: relative; }
+        .del-btn { position: absolute; right: 10px; top: 10px; color: #ccc; border: none; background: none; font-size: 20px; cursor: pointer; }
+        
+        .toast { display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:white; padding:10px 20px; border-radius:20px; z-index:100; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✈️ 日本行：網址一鍵分享</h1>
+
+    <div class="name-settings">
+        <div class="grid-3">
+            <input type="text" id="name0" value="成員 A" oninput="updateNames()">
+            <input type="text" id="name1" value="成員 B" oninput="updateNames()">
+            <input type="text" id="name2" value="成員 C" oninput="updateNames()">
+        </div>
+    </div>
+
+    <div class="rate-box">
+        <span>匯率 1 JPY = <input type="number" id="exchangeRate" value="0.21" step="0.001" onchange="saveAndRender()"> TWD</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1.5fr; gap:8px;">
+        <input type="date" id="itemDate">
+        <input type="text" id="itemName" placeholder="項目名稱">
+    </div>
+    <select id="itemCat">
+        <option value="🍱 美食">🍱 美食</option>
+        <option value="🚆 交通">🚆 交通</option>
+        <option value="🏨 住宿">🏨 住宿</option>
+        <option value="🛍️ 購物">🛍️ 購物</option>
+        <option value="🎟️ 門票">🎟️ 門票</option>
+        <option value="✨ 其他">✨ 其他</option>
+    </select>
+
+    <div class="currency-selector">
+        <button id="btnJPY" class="active" onclick="setCurrency('JPY')">支付日幣 (JPY)</button>
+        <button id="btnTWD" onclick="setCurrency('TWD')">支付台幣 (TWD)</button>
+    </div>
+
+    <label style="font-size:0.85rem; font-weight:bold; color:#555;">💰 誰墊錢？(<span id="currencyLabel">JPY</span>)</label>
+    <div class="grid-3">
+        <div class="person-input"><span class="label-name">成員 A</span><input type="number" id="pay0" value="0" onclick="this.select()"></div>
+        <div class="person-input"><span class="label-name">成員 B</span><input type="number" id="pay1" value="0" onclick="this.select()"></div>
+        <div class="person-input"><span class="label-name">成員 C</span><input type="number" id="pay2" value="0" onclick="this.select()"></div>
+    </div>
+
+    <label style="font-size:0.85rem; font-weight:bold; color:#555; margin-top:15px; display:block;">⚖️ 誰分攤？</label>
+    <div class="grid-3">
+        <div class="person-input active" id="splitBox0">
+            <label class="check-container"><input type="checkbox" id="check0" checked onchange="toggleBox(0)"><span class="label-name">成員 A</span></label>
+            <input type="number" id="weight0" value="1" step="0.5" style="width:100%; border:1px solid #eee; text-align:center;">
+        </div>
+        <div class="person-input active" id="splitBox1">
+            <label class="check-container"><input type="checkbox" id="check1" checked onchange="toggleBox(1)"><span class="label-name">成員 B</span></label>
+            <input type="number" id="weight1" value="1" step="0.5" style="width:100%; border:1px solid #eee; text-align:center;">
+        </div>
+        <div class="person-input active" id="splitBox2">
+            <label class="check-container"><input type="checkbox" id="check2" checked onchange="toggleBox(2)"><span class="label-name">成員 C</span></label>
+            <input type="number" id="weight2" value="1" step="0.5" style="width:100%; border:1px solid #eee; text-align:center;">
+        </div>
+    </div>
+
+    <button class="add-btn" onclick="addRecord()">新增帳目</button>
+
+    <div class="result-card">
+        <h2 style="margin:0 0 10px 0; font-size:1.1rem; color: var(--info);">💰 台幣結算報告</h2>
+        <div id="settlementDetail">尚未輸入帳目</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+            <button onclick="copyShareUrl()" style="background:var(--info)">複製分享網址</button>
+            <button onclick="exportToSheet()" style="background:#673ab7">匯出試算表</button>
+        </div>
+    </div>
+
+    <div id="historyList"></div>
+    <button onclick="clearData()" style="background:#95a5a6; font-size:12px; margin-top:40px;">清空所有資料</button>
+</div>
+
+<div id="toast" class="toast">網址已複製！</div>
+
+<script>
+    document.getElementById('itemDate').valueAsDate = new Date();
+    let userNames = JSON.parse(localStorage.getItem('trip_names')) || ["成員 A", "成員 B", "成員 C"];
+    let records = JSON.parse(localStorage.getItem('trip_v_url')) || [];
+    let rate = parseFloat(localStorage.getItem('trip_rate')) || 0.21;
+    let currentCurrency = 'JPY';
+
+    // 頁面載入時檢查網址是否有分享數據
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedData = urlParams.get('data');
+        if (sharedData) {
+            try {
+                const decoded = JSON.parse(decodeURIComponent(escape(atob(sharedData))));
+                if (confirm("偵測到分享資料，是否要覆蓋目前的帳目？")) {
+                    records = decoded.r; userNames = decoded.n; rate = decoded.rt;
+                    saveAndRender();
+                    // 清除網址參數，避免重複匯入
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            } catch(e) { console.error("解析分享網址失敗"); }
+        }
+        userNames.forEach((n, i) => document.getElementById(`name${i}`).value = n);
+        document.getElementById('exchangeRate').value = rate;
+        render();
+    };
+
+    function toggleBox(idx) {
+        const isChecked = document.getElementById(`check${idx}`).checked;
+        document.getElementById(`splitBox${idx}`).classList.toggle('active', isChecked);
+        document.getElementById(`weight${idx}`).value = isChecked ? 1 : 0;
+    }
+
+    function setCurrency(curr) {
+        currentCurrency = curr;
+        document.getElementById('btnJPY').classList.toggle('active', curr === 'JPY');
+        document.getElementById('btnTWD').classList.toggle('active', curr === 'TWD');
+        document.getElementById('currencyLabel').innerText = curr;
+    }
+
+    function updateNames() {
+        userNames = [0,1,2].map(i => document.getElementById(`name${i}`).value || `成員 ${String.fromCharCode(65+i)}`);
+        document.querySelectorAll('.label-name').forEach((el, idx) => el.innerText = userNames[idx % 3]);
+        localStorage.setItem('trip_names', JSON.stringify(userNames));
+        render();
+    }
+
+    function addRecord() {
+        const date = document.getElementById('itemDate').value;
+        const name = document.getElementById('itemName').value || '未命名項目';
+        const cat = document.getElementById('itemCat').value;
+        const p = [0,1,2].map(i => parseFloat(document.getElementById(`pay${i}`).value)||0);
+        const w = [0,1,2].map(i => parseFloat(document.getElementById(`weight${i}`).value)||0);
+        const inputTotal = p.reduce((a,b)=>a+b, 0);
+
+        if (inputTotal === 0) return alert("請輸入金額");
+        const amountInTWD = currentCurrency === 'TWD' ? inputTotal : inputTotal * rate;
+        const paysInTWD = p.map(val => currentCurrency === 'TWD' ? val : val * rate);
+
+        records.push({ id: Date.now(), date, name, cat, origCurrency: currentCurrency, origTotal: inputTotal, totalTWD: amountInTWD, paysInTWD: paysInTWD, weights: w });
+        document.getElementById('itemName').value = '';
+        [0,1,2].forEach(i => document.getElementById(`pay${i}`).value = 0);
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        rate = parseFloat(document.getElementById('exchangeRate').value) || 0.21;
+        localStorage.setItem('trip_v_url', JSON.stringify(records));
+        localStorage.setItem('trip_rate', rate);
+        render();
+    }
+
+    function render() {
+        const list = document.getElementById('historyList');
+        list.innerHTML = '';
+        let balancesTWD = [0, 0, 0];
+        const sorted = [...records].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+        
+        records.forEach(r => {
+            const totalW = r.weights.reduce((a, b) => a + b, 0);
+            for(let i=0; i<3; i++) balancesTWD[i] += (r.paysInTWD[i] - (r.totalTWD / totalW * r.weights[i]));
+        });
+
+        sorted.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `<div style="font-size:0.75rem; color:#999; margin-bottom:4px;">${r.date} | ${r.cat}</div>
+                <strong>${r.name}</strong>: ${r.origCurrency === 'JPY' ? '¥' : '$'}${r.origTotal.toLocaleString()}
+                <button class="del-btn" onclick="deleteRecord(${r.id})">×</button>`;
+            list.appendChild(div);
+        });
+
+        let html = '<ul style="padding:0; margin:0; list-style:none;">';
+        let debtors = [], creditors = [];
+        balancesTWD.forEach((b, i) => b < -0.1 ? debtors.push({i, amt: -b}) : (b > 0.1 ? creditors.push({i, amt: b}) : null));
+        debtors.forEach(d => {
+            creditors.forEach(c => {
+                if (d.amt > 0 && c.amt > 0) {
+                    let move = Math.min(d.amt, c.amt);
+                    html += `<li style="padding:10px 0; border-bottom:1px dashed #cfe2f3;">
+                        💸 <strong>${userNames[d.i]}</strong> ➜ <strong>${userNames[c.i]}</strong><br>
+                        支付：<span class="twd-amount">NT$ ${Math.round(move).toLocaleString()}</span></li>`;
+                    d.amt -= move; c.amt -= move;
+                }
+            });
+        });
+        document.getElementById('settlementDetail').innerHTML = records.length ? html + '</ul>' : "尚未輸入帳目";
+        document.querySelectorAll('.label-name').forEach((el, idx) => el.innerText = userNames[idx % 3]);
+    }
+
+    // 分享功能：生成網址
+    function copyShareUrl() {
+        const data = { r: records, n: userNames, rt: rate };
+        const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        // 獲取目前不帶參數的網址
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?data=${base64Data}`;
+        
+        const el = document.createElement('textarea');
+        el.value = shareUrl;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2000);
+    }
+
+    function exportToSheet() {
+        let csv = `日期\t項目\t分類\t幣值\t金額\t台幣換算\n`;
+        records.forEach(r => csv += `${r.date}\t${r.name}\t${r.cat}\t${r.origCurrency}\t${r.origTotal}\t${Math.round(r.totalTWD)}\n`);
+        const el = document.createElement('textarea');
+        el.value = csv; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el);
+        alert("已複製表格格式！");
+    }
+
+    function deleteRecord(id) { if(confirm("確定刪除？")) { records = records.filter(r => r.id !== id); saveAndRender(); } }
+    function clearData() { if(confirm("確定清空？")) { records = []; saveAndRender(); } }
+</script>
+</body>
+</html>
