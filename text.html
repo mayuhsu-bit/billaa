@@ -83,7 +83,7 @@
         }
         .currency-selector button.active { background: var(--info); color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
 
-        /* 誰墊錢 & 誰分攤對齊優化 */
+        /* 誰墊錢 & 誰分攤區域 */
         .person-card {
             background: #fff; 
             border: 1px solid #eee; 
@@ -95,16 +95,25 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 110px; /* 固定高度確保對齊 */
+            min-height: 110px; 
         }
         .person-card.active { border-color: var(--success); background: #f1fcf4; }
-        .person-card span { font-size: 0.8rem; display: block; margin-bottom: 5px; color: #666; font-weight: bold; }
+        
+        /* 統一旅伴名稱大小：與最上方旅伴區輸入框一致 (0.85rem) */
+        .person-card .label-name { 
+            font-size: 0.85rem; 
+            display: block; 
+            margin-bottom: 5px; 
+            color: var(--secondary); 
+            font-weight: bold; 
+        }
+        
         .person-card input[type="number"] { width: 90%; border: 1px solid #eee; border-radius: 8px; padding: 6px; text-align: center; font-size: 0.9rem; }
 
-        /* 勾選容器垂直居中 */
+        /* 勾選容器對齊 */
         .check-container { 
             display: flex; 
-            flex-direction: column; /* 勾選框在名字上方 */
+            flex-direction: column;
             align-items: center; 
             justify-content: center; 
             cursor: pointer; 
@@ -332,8 +341,8 @@
     }
 
     function exportToSheet() {
-        let csv = `日期\t項目\t分類\t台幣金額\n`;
-        records.forEach(r => csv += `${r.date}\t${r.name}\t${r.cat}\t${Math.round(r.totalTWD)}\n`);
+        let csv = `日期\\t項目\\t分類\\t台幣金額\\n`;
+        records.forEach(r => csv += `${r.date}\\t${r.name}\\t${r.cat}\\t${Math.round(r.totalTWD)}\\n`);
         const el = document.createElement('textarea'); el.value = csv; document.body.appendChild(el); el.select();
         document.execCommand('copy'); document.body.removeChild(el);
         alert("已複製表格格式，請在 Excel 貼上。");
