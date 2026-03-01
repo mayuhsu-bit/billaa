@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五月日本行｜分帳入口</title>
+    <style>
+        :root {
+            --primary-color: #ff4757; /* 櫻花粉紅 */
+            --bg-color: #f8f9fa;
+            --text-dark: #2f3542;
+        }
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: var(--text-dark);
+            text-align: center;
+        }
+        .hero-card {
+            background: white;
+            padding: 40px 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--text-dark);
+        }
+        p {
+            color: #747d8c;
+            margin: 10px 0 30px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .btn-start {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-start:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 10px rgba(255, 71, 87, 0.2);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        .feat-item {
+            font-size: 0.8rem;
+            background: #f1f2f6;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .feat-item span { margin-right: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="hero-card">
+    <div class="icon">🇯🇵</div>
+    <h1>五月日本旅遊</h1>
+    <p>匯率換算 · 多人分帳 · 一鍵分享<br>讓旅行的帳目簡簡單單。</p>
+    
+    <a href="split_tool.html" class="btn-start">開始記帳</a>
+
+    <div class="features">
+        <div class="feat-item"><span>💴</span> 即時匯率</div>
+        <div class="feat-item"><span>✅</span> 勾選分攤</div>
+        <div class="feat-item"><span>🔗</span> 網址分享</div>
+        <div class="feat-item"><span>📊</span> 試算表匯出</div>
+    </div>
+    
+    <div style="margin-top: 30px; font-size: 0.7rem; color: #ced4da;">
+        v1.0｜專為五月三人行設計
+    </div>
+</div>
+
+</body>
+</html>
