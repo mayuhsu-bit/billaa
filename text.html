@@ -83,16 +83,35 @@
         }
         .currency-selector button.active { background: var(--info); color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
 
-        /* 誰墊錢 & 誰分攤 */
+        /* 誰墊錢 & 誰分攤對齊優化 */
         .person-card {
-            background: #fff; border: 1px solid #eee; padding: 10px; border-radius: 15px; text-align: center; transition: 0.3s;
+            background: #fff; 
+            border: 1px solid #eee; 
+            padding: 10px; 
+            border-radius: 15px; 
+            text-align: center; 
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 110px; /* 固定高度確保對齊 */
         }
         .person-card.active { border-color: var(--success); background: #f1fcf4; }
         .person-card span { font-size: 0.8rem; display: block; margin-bottom: 5px; color: #666; font-weight: bold; }
-        .person-card input[type="number"] { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 6px; text-align: center; font-size: 0.9rem; }
+        .person-card input[type="number"] { width: 90%; border: 1px solid #eee; border-radius: 8px; padding: 6px; text-align: center; font-size: 0.9rem; }
 
-        .check-container { display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 5px; }
-        .check-container input { width: 16px; height: 16px; margin-right: 5px; }
+        /* 勾選容器垂直居中 */
+        .check-container { 
+            display: flex; 
+            flex-direction: column; /* 勾選框在名字上方 */
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        .check-container input { width: 18px; height: 18px; margin: 0 0 5px 0; }
 
         .btn-add {
             width: 100%; padding: 16px; background: linear-gradient(135deg, var(--success), #2ecc71); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 25px; box-shadow: 0 8px 15px rgba(39, 174, 96, 0.2);
