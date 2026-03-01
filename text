@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本行｜台幣結算中心</title>
+    <style>
+        :root {
+            --primary: #ff4757; /* 櫻花粉 */
+            --secondary: #2f3542;
+            --success: #27ae60;
+            --info: #3498db;
+            --bg: #f8f9fa;
+        }
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 15px;
+            color: var(--secondary);
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        /* 導覽列 */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .btn-back {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            background: #fff0f0;
+            padding: 8px 15px;
+            border-radius: 50px;
+            transition: 0.2s;
+        }
+        .btn-back:active { transform: scale(0.95); }
+
+        h1 { font-size: 1.4rem; margin: 0; color: var(--secondary); text-align: center; flex-grow: 1; margin-right: 40px; }
+
+        /* 成員名稱與匯率區 */
+        .config-section {
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #fee2e2;
+        }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .grid-3 input { 
+            padding: 10px; border: 1px solid #ddd; border-radius: 10px; text-align: center; font-size: 0.85rem; 
+        }
+
+        .rate-box {
+            display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-top: 10px; color: #666;
+        }
+        .rate-box input { width: 65px; padding: 5px; text-align: center; font-weight: bold; border-radius: 5px; border: 1px solid #ccc; }
+
+        /* 輸入區 */
+        label { font-size: 0.85rem; font-weight: bold; color: #555; display: block; margin: 15px 0 8px; }
+        input[type="text"], input[type="date"], select {
+            width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; background: #fafafa;
+        }
+
+        .currency-selector { display: flex; gap: 8px; margin-bottom: 15px; }
+        .currency-selector button {
+            flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; background: #eee; color: #888;
+        }
+        .currency-selector button.active { background: var(--info); color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
+
+        /* 誰墊錢 & 誰分攤對齊優化 */
+        .person-card {
+            background: #fff; 
+            border: 1px solid #eee; 
+            padding: 10px; 
+            border-radius: 15px; 
+            text-align: center; 
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 110px; /* 固定高度確保對齊 */
+        }
+        .person-card.active { border-color: var(--success); background: #f1fcf4; }
+        .person-card span { font-size: 0.8rem; display: block; margin-bottom: 5px; color: #666; font-weight: bold; }
+        .person-card input[type="number"] { width: 90%; border: 1px solid #eee; border-radius: 8px; padding: 6px; text-align: center; font-size: 0.9rem; }
+
+        /* 勾選容器垂直居中 */
+        .check-container { 
+            display: flex; 
+            flex-direction: column; /* 勾選框在名字上方 */
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        .check-container input { width: 18px; height: 18px; margin: 0 0 5px 0; }
+
+        .btn-add {
+            width: 100%; padding: 16px; background: linear-gradient(135deg, var(--success), #2ecc71); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 25px; box-shadow: 0 8px 15px rgba(39, 174, 96, 0.2);
+        }
+        .btn-add:active { transform: scale(0.98); }
+
+        /* 結算區 */
+        .result-card {
+            background: #f0f7ff; padding: 20px; border-radius: 20px; margin-top: 30px; border-left: 6px solid var(--info);
+        }
+        .result-card h2 { margin: 0 0 15px 0; font-size: 1.1rem; color: var(--info); }
+        .summary-list { padding: 0; margin: 0; list-style: none; }
+        .summary-list li { padding: 12px 0; border-bottom: 1px dashed #d1e3f5; line-height: 1.6; }
+        .twd-bold { color: var(--primary); font-size: 1.2rem; font-weight: bold; }
+
+        /* 功能按鈕 */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-action { padding: 10px; border-radius: 10px; border: none; color: white; font-weight: bold; font-size: 0.85rem; cursor: pointer; }
+
+        /* 歷史明細 */
+        .history-item {
+            background: white; border: 1px solid #f0f0f0; padding: 15px; border-radius: 15px; margin-top: 12px; position: relative;
+        }
+        .item-meta { font-size: 0.75rem; color: #aaa; margin-bottom: 5px; }
+        .del-btn { position: absolute; right: 12px; top: 12px; color: #ddd; border: none; background: none; font-size: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-header">
+        <a href="https://mayuhsu-bit.github.io/billaa/" class="btn-back">⬅ 回首頁</a>
+        <h1>記帳中心</h1>
+    </div>
+
+    <div class="config-section">
+        <h3>👥 旅伴名稱</h3>
+        <div class="grid-3">
+            <input type="text" id="name0" value="成員 A" oninput="updateNames()">
+            <input type="text" id="name1" value="成員 B" oninput="updateNames()">
+            <input type="text" id="name2" value="成員 C" oninput="updateNames()">
+        </div>
+        <div class="rate-box">
+            <span>💱 匯率 1 JPY = <input type="number" id="exchangeRate" value="0.21" step="0.001" onchange="saveAndRender()"> TWD</span>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1.2fr 2fr; gap:10px;">
+        <input type="date" id="itemDate">
+        <input type="text" id="itemName" placeholder="項目名稱">
+    </div>
+    <select id="itemCat">
+        <option value="🍱 美食">🍱 美食</option>
+        <option value="🚆 交通">🚆 交通</option>
+        <option value="🏨 住宿">🏨 住宿</option>
+        <option value="🛍️ 購物">🛍️ 購物</option>
+        <option value="🎟️ 門票">🎟️ 門票</option>
+        <option value="✨ 其他">✨ 其他</option>
+    </select>
+
+    <div class="currency-selector">
+        <button id="btnJPY" class="active" onclick="setCurrency('JPY')">日幣支付 (JPY)</button>
+        <button id="btnTWD" onclick="setCurrency('TWD')">台幣支付 (TWD)</button>
+    </div>
+
+    <label>💰 誰墊錢？(<span id="currencyLabel">JPY</span>)</label>
+    <div class="grid-3">
+        <div class="person-card"><span class="label-name">成員 A</span><input type="number" id="pay0" value="0" onclick="this.select()"></div>
+        <div class="person-card"><span class="label-name">成員 B</span><input type="number" id="pay1" value="0" onclick="this.select()"></div>
+        <div class="person-card"><span class="label-name">成員 C</span><input type="number" id="pay2" value="0" onclick="this.select()"></div>
+    </div>
+
+    <label>⚖️ 誰分攤？(勾選參與者)</label>
+    <div class="grid-3">
+        <div class="person-card active" id="splitBox0">
+            <label class="check-container"><input type="checkbox" id="check0" checked onchange="toggleBox(0)"><span class="label-name">成員 A</span></label>
+            <input type="number" id="weight0" value="1" step="0.5">
+        </div>
+        <div class="person-card active" id="splitBox1">
+            <label class="check-container"><input type="checkbox" id="check1" checked onchange="toggleBox(1)"><span class="label-name">成員 B</span></label>
+            <input type="number" id="weight1" value="1" step="0.5">
+        </div>
+        <div class="person-card active" id="splitBox2">
+            <label class="check-container"><input type="checkbox" id="check2" checked onchange="toggleBox(2)"><span class="label-name">成員 C</span></label>
+            <input type="number" id="weight2" value="1" step="0.5">
+        </div>
+    </div>
+
+    <button class="btn-add" onclick="addRecord()">新增這筆開銷</button>
+
+    <div class="result-card">
+        <h2>💰 最終台幣結算報告</h2>
+        <div id="settlementDetail">尚無資料</div>
+        <div class="action-grid">
+            <button class="btn-action" onclick="copyShareUrl()" style="background:var(--info)">🔗 分享網址</button>
+            <button class="btn-action" onclick="exportToSheet()" style="background:#673ab7">📊 匯出 Excel</button>
+        </div>
+    </div>
+
+    <div id="historyList"></div>
+    <button onclick="clearData()" style="background:none; border:none; color:#ccc; font-size:12px; margin-top:40px; cursor:pointer; width:100%;">清空所有紀錄</button>
+</div>
+
+<script>
+    document.getElementById('itemDate').valueAsDate = new Date();
+    let userNames = JSON.parse(localStorage.getItem('trip_names')) || ["成員 A", "成員 B", "成員 C"];
+    let records = JSON.parse(localStorage.getItem('trip_v_final_url')) || [];
+    let rate = parseFloat(localStorage.getItem('trip_rate')) || 0.21;
+    let currentCurrency = 'JPY';
+
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedData = urlParams.get('data');
+        if (sharedData) {
+            try {
+                const decoded = JSON.parse(decodeURIComponent(escape(atob(sharedData))));
+                if (confirm("偵測到分享資料，是否覆蓋目前的帳目？")) {
+                    records = decoded.r; userNames = decoded.n; rate = decoded.rt;
+                    saveAndRender();
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            } catch(e) { console.error("解析失敗"); }
+        }
+        userNames.forEach((n, i) => document.getElementById(`name${i}`).value = n);
+        document.getElementById('exchangeRate').value = rate;
+        render();
+    };
+
+    function toggleBox(idx) {
+        const isChecked = document.getElementById(`check${idx}`).checked;
+        document.getElementById(`splitBox${idx}`).classList.toggle('active', isChecked);
+        document.getElementById(`weight${idx}`).value = isChecked ? 1 : 0;
+    }
+
+    function setCurrency(curr) {
+        currentCurrency = curr;
+        document.getElementById('btnJPY').classList.toggle('active', curr === 'JPY');
+        document.getElementById('btnTWD').classList.toggle('active', curr === 'TWD');
+        document.getElementById('currencyLabel').innerText = curr;
+    }
+
+    function updateNames() {
+        userNames = [0,1,2].map(i => document.getElementById(`name${i}`).value || `成員 ${i}`);
+        document.querySelectorAll('.label-name').forEach((el, idx) => el.innerText = userNames[idx % 3]);
+        localStorage.setItem('trip_names', JSON.stringify(userNames));
+        render();
+    }
+
+    function addRecord() {
+        const date = document.getElementById('itemDate').value;
+        const name = document.getElementById('itemName').value || '未命名項目';
+        const cat = document.getElementById('itemCat').value;
+        const p = [0,1,2].map(i => parseFloat(document.getElementById(`pay${i}`).value)||0);
+        const w = [0,1,2].map(i => parseFloat(document.getElementById(`weight${i}`).value)||0);
+        const total = p.reduce((a,b)=>a+b, 0);
+
+        if (total === 0) return alert("請輸入金額");
+        const totalTWD = currentCurrency === 'TWD' ? total : total * rate;
+        const paysInTWD = p.map(v => currentCurrency === 'TWD' ? v : v * rate);
+
+        records.push({ id: Date.now(), date, name, cat, origCurrency: currentCurrency, origTotal: total, totalTWD, paysInTWD, weights: w });
+        document.getElementById('itemName').value = '';
+        [0,1,2].forEach(i => document.getElementById(`pay${i}`).value = 0);
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        rate = parseFloat(document.getElementById('exchangeRate').value) || 0.21;
+        localStorage.setItem('trip_v_final_url', JSON.stringify(records));
+        localStorage.setItem('trip_rate', rate);
+        render();
+    }
+
+    function render() {
+        const list = document.getElementById('historyList');
+        list.innerHTML = '';
+        let balancesTWD = [0, 0, 0];
+        const sorted = [...records].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+        
+        records.forEach(r => {
+            const totalW = r.weights.reduce((a, b) => a + b, 0);
+            for(let i=0; i<3; i++) balancesTWD[i] += (r.paysInTWD[i] - (r.totalTWD / totalW * r.weights[i]));
+        });
+
+        sorted.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `<div class="item-meta">📅 ${r.date} | ${r.cat}</div>
+                <strong>${r.name}</strong>: ${r.origCurrency === 'JPY' ? '¥' : '$'}${r.origTotal.toLocaleString()}
+                <button class="del-btn" onclick="deleteRecord(${r.id})">×</button>`;
+            list.appendChild(div);
+        });
+
+        let html = '<ul class="summary-list">';
+        let debtors = [], creditors = [];
+        balancesTWD.forEach((b, i) => b < -0.1 ? debtors.push({i, amt: -b}) : (b > 0.1 ? creditors.push({i, amt: b}) : null));
+        debtors.forEach(d => {
+            creditors.forEach(c => {
+                if (d.amt > 0 && c.amt > 0) {
+                    let move = Math.min(d.amt, c.amt);
+                    html += `<li>💸 <strong>${userNames[d.i]}</strong> ➜ <strong>${userNames[c.i]}</strong><br>
+                        應轉帳：<span class="twd-bold">NT$ ${Math.round(move).toLocaleString()}</span></li>`;
+                    d.amt -= move; c.amt -= move;
+                }
+            });
+        });
+        document.getElementById('settlementDetail').innerHTML = records.length ? html + '</ul>' : "目前無記帳數據。";
+        document.querySelectorAll('.label-name').forEach((el, idx) => el.innerText = userNames[idx % 3]);
+    }
+
+    function copyShareUrl() {
+        const data = { r: records, n: userNames, rt: rate };
+        const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?data=${base64Data}`;
+        const el = document.createElement('textarea'); el.value = shareUrl; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el);
+        alert("分享網址已複製！傳給旅伴點開即可同步。");
+    }
+
+    function exportToSheet() {
+        let csv = `日期\t項目\t分類\t台幣金額\n`;
+        records.forEach(r => csv += `${r.date}\t${r.name}\t${r.cat}\t${Math.round(r.totalTWD)}\n`);
+        const el = document.createElement('textarea'); el.value = csv; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el);
+        alert("已複製表格格式，請在 Excel 貼上。");
+    }
+
+    function deleteRecord(id) { if(confirm("確定刪除？")) { records = records.filter(r => r.id !== id); saveAndRender(); } }
+    function clearData() { if(confirm("確定清空？")) { records = []; saveAndRender(); } }
+</script>
+
+</body>
+</html>
