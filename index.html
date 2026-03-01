@@ -3,99 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五月日本行｜分帳入口</title>
+    <title>五月日本行｜旅費分帳入口</title>
     <style>
         :root {
-            --primary-color: #ff4757; /* 櫻花粉紅 */
-            --bg-color: #f8f9fa;
-            --text-dark: #2f3542;
+            --primary: #ff4757;
+            --secondary: #2f3542;
+            --accent: #ffa502;
+            --bg: #f1f2f6;
         }
         body {
             font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            color: var(--text-dark);
-            text-align: center;
+            color: var(--secondary);
         }
-        .hero-card {
+        .hero-container {
             background: white;
-            padding: 40px 20px;
+            padding: 50px 30px;
             width: 90%;
-            max-width: 400px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 420px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .icon {
-            font-size: 60px;
-            margin-bottom: 20px;
+        /* 裝飾背景 */
+        .hero-container::before {
+            content: "JAPAN";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 80px;
+            font-weight: 900;
+            color: rgba(255, 71, 87, 0.05);
+            z-index: 0;
+        }
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #fff0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 25px;
+            position: relative;
+            z-index: 1;
         }
         h1 {
             margin: 0;
             font-size: 1.8rem;
-            color: var(--text-dark);
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
         }
         p {
             color: #747d8c;
-            margin: 10px 0 30px 0;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            margin: 15px 0 35px;
+            line-height: 1.6;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
         }
-        .btn-start {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff4757, #ff6b81);
+        .btn-link {
+            display: block;
+            background: linear-gradient(135deg, var(--primary), #ff6b81);
             color: white;
             text-decoration: none;
-            padding: 16px 40px;
-            border-radius: 50px;
+            padding: 18px;
+            border-radius: 15px;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
         }
-        .btn-start:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 10px rgba(255, 71, 87, 0.2);
+        .btn-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(255, 71, 87, 0.4);
         }
-        .features {
+        .btn-link:active {
+            transform: translateY(1px);
+        }
+        .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             margin-top: 40px;
-            text-align: left;
+            position: relative;
+            z-index: 1;
         }
-        .feat-item {
-            font-size: 0.8rem;
-            background: #f1f2f6;
-            padding: 10px;
+        .info-tag {
+            background: #f8f9fa;
+            padding: 12px;
             border-radius: 12px;
+            font-size: 0.85rem;
+            color: #57606f;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
-        .feat-item span { margin-right: 8px; }
+        .info-tag span { margin-right: 6px; }
+        .footer-text {
+            margin-top: 35px;
+            font-size: 0.75rem;
+            color: #ced4da;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-<div class="hero-card">
-    <div class="icon">🇯🇵</div>
-    <h1>五月日本旅遊</h1>
-    <p>匯率換算 · 多人分帳 · 一鍵分享<br>讓旅行的帳目簡簡單單。</p>
+<div class="hero-container">
+    <div class="icon-circle">🗻</div>
+    <h1>五月日本行分帳</h1>
+    <p>匯率即時轉換 · 勾選式自動分帳<br>專為三人旅遊量身打造</p>
     
-    <a href="split_tool.html" class="btn-start">開始記帳</a>
+    <a href="https://mayuhsu-bit.github.io/billaa/text.html" class="btn-link">進入分帳網頁</a>
 
-    <div class="features">
-        <div class="feat-item"><span>💴</span> 即時匯率</div>
-        <div class="feat-item"><span>✅</span> 勾選分攤</div>
-        <div class="feat-item"><span>🔗</span> 網址分享</div>
-        <div class="feat-item"><span>📊</span> 試算表匯出</div>
+    <div class="info-grid">
+        <div class="info-tag"><span>💴</span> 台幣/日幣</div>
+        <div class="info-tag"><span>✅</span> 成員勾選</div>
+        <div class="info-tag"><span>🔗</span> 網址同步</div>
+        <div class="info-tag"><span>📊</span> 試算表匯出</div>
     </div>
     
-    <div style="margin-top: 30px; font-size: 0.7rem; color: #ced4da;">
-        v1.0｜專為五月三人行設計
+    <div class="footer-text">
+        MAY TRIP 2026 | VERSION 2.0
     </div>
 </div>
 
