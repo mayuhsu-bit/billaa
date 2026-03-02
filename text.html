@@ -6,7 +6,7 @@
     <title>日本行｜台幣結算中心</title>
     <style>
         :root {
-            --primary: #ff4757; /* 櫻花粉 */
+            --primary: #ff4757;
             --secondary: #2f3542;
             --success: #27ae60;
             --info: #3498db;
@@ -30,7 +30,6 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.08);
         }
 
-        /* 導覽列 */
         .nav-header {
             display: flex;
             justify-content: space-between;
@@ -47,13 +46,10 @@
             background: #fff0f0;
             padding: 8px 15px;
             border-radius: 50px;
-            transition: 0.2s;
         }
-        .btn-back:active { transform: scale(0.95); }
 
         h1 { font-size: 1.4rem; margin: 0; color: var(--secondary); text-align: center; flex-grow: 1; margin-right: 40px; }
 
-        /* 成員名稱與匯率區 */
         .config-section {
             background: #fdf2f2;
             padding: 15px;
@@ -71,7 +67,6 @@
         }
         .rate-box input { width: 65px; padding: 5px; text-align: center; font-weight: bold; border-radius: 5px; border: 1px solid #ccc; }
 
-        /* 輸入區 */
         label { font-size: 0.85rem; font-weight: bold; color: #555; display: block; margin: 15px 0 8px; }
         input[type="text"], input[type="date"], select {
             width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; background: #fafafa;
@@ -79,18 +74,16 @@
 
         .currency-selector { display: flex; gap: 8px; margin-bottom: 15px; }
         .currency-selector button {
-            flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; background: #eee; color: #888;
+            flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: #eee; color: #888;
         }
-        .currency-selector button.active { background: var(--info); color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
+        .currency-selector button.active { background: var(--info); color: white; }
 
-        /* 誰墊錢 & 誰分攤區域 */
         .person-card {
             background: #fff; 
             border: 1px solid #eee; 
             padding: 10px; 
             border-radius: 15px; 
             text-align: center; 
-            transition: 0.3s;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -98,19 +91,9 @@
             min-height: 110px; 
         }
         .person-card.active { border-color: var(--success); background: #f1fcf4; }
-        
-        /* 統一旅伴名稱大小：與最上方旅伴區輸入框一致 (0.85rem) */
-        .person-card .label-name { 
-            font-size: 0.85rem; 
-            display: block; 
-            margin-bottom: 5px; 
-            color: var(--secondary); 
-            font-weight: bold; 
-        }
-        
+        .person-card .label-name { font-size: 0.85rem; display: block; margin-bottom: 5px; color: var(--secondary); font-weight: bold; }
         .person-card input[type="number"] { width: 90%; border: 1px solid #eee; border-radius: 8px; padding: 6px; text-align: center; font-size: 0.9rem; }
 
-        /* 勾選容器對齊 */
         .check-container { 
             display: flex; 
             flex-direction: column;
@@ -123,11 +106,9 @@
         .check-container input { width: 18px; height: 18px; margin: 0 0 5px 0; }
 
         .btn-add {
-            width: 100%; padding: 16px; background: linear-gradient(135deg, var(--success), #2ecc71); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 25px; box-shadow: 0 8px 15px rgba(39, 174, 96, 0.2);
+            width: 100%; padding: 16px; background: linear-gradient(135deg, var(--success), #2ecc71); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 25px;
         }
-        .btn-add:active { transform: scale(0.98); }
 
-        /* 結算區 */
         .result-card {
             background: #f0f7ff; padding: 20px; border-radius: 20px; margin-top: 30px; border-left: 6px solid var(--info);
         }
@@ -136,11 +117,9 @@
         .summary-list li { padding: 12px 0; border-bottom: 1px dashed #d1e3f5; line-height: 1.6; }
         .twd-bold { color: var(--primary); font-size: 1.2rem; font-weight: bold; }
 
-        /* 功能按鈕 */
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .btn-action { padding: 10px; border-radius: 10px; border: none; color: white; font-weight: bold; font-size: 0.85rem; cursor: pointer; }
 
-        /* 歷史明細 */
         .history-item {
             background: white; border: 1px solid #f0f0f0; padding: 15px; border-radius: 15px; margin-top: 12px; position: relative;
         }
@@ -227,7 +206,7 @@
 <script>
     document.getElementById('itemDate').valueAsDate = new Date();
     let userNames = JSON.parse(localStorage.getItem('trip_names')) || ["成員 A", "成員 B", "成員 C"];
-    let records = JSON.parse(localStorage.getItem('trip_v_final_url')) || [];
+    let records = JSON.parse(localStorage.getItem('trip_v_final_share')) || [];
     let rate = parseFloat(localStorage.getItem('trip_rate')) || 0.21;
     let currentCurrency = 'JPY';
 
@@ -236,15 +215,24 @@
         const sharedData = urlParams.get('data');
         if (sharedData) {
             try {
+                // 優化：直接解析並處理轉譯
                 const decoded = JSON.parse(decodeURIComponent(escape(atob(sharedData))));
-                if (confirm("偵測到分享資料，是否覆蓋目前的帳目？")) {
-                    records = decoded.r; userNames = decoded.n; rate = decoded.rt;
+                if (confirm("偵測到旅伴分享的帳務資料，是否導入？\n(這將會暫時覆蓋您目前的紀錄)")) {
+                    records = decoded.r; 
+                    userNames = decoded.n; 
+                    rate = decoded.rt;
                     saveAndRender();
+                    // 清除網址列的 data，避免重新整理後重複詢問
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
-            } catch(e) { console.error("解析失敗"); }
+            } catch(e) { 
+                console.error("分享資料解析錯誤", e); 
+            }
         }
-        userNames.forEach((n, i) => document.getElementById(`name${i}`).value = n);
+        userNames.forEach((n, i) => {
+            const el = document.getElementById(`name${i}`);
+            if(el) el.value = n;
+        });
         document.getElementById('exchangeRate').value = rate;
         render();
     };
@@ -289,7 +277,7 @@
 
     function saveAndRender() {
         rate = parseFloat(document.getElementById('exchangeRate').value) || 0.21;
-        localStorage.setItem('trip_v_final_url', JSON.stringify(records));
+        localStorage.setItem('trip_v_final_share', JSON.stringify(records));
         localStorage.setItem('trip_rate', rate);
         render();
     }
@@ -302,7 +290,9 @@
         
         records.forEach(r => {
             const totalW = r.weights.reduce((a, b) => a + b, 0);
-            for(let i=0; i<3; i++) balancesTWD[i] += (r.paysInTWD[i] - (r.totalTWD / totalW * r.weights[i]));
+            if(totalW > 0) {
+                for(let i=0; i<3; i++) balancesTWD[i] += (r.paysInTWD[i] - (r.totalTWD / totalW * r.weights[i]));
+            }
         });
 
         sorted.forEach(r => {
@@ -317,35 +307,53 @@
         let html = '<ul class="summary-list">';
         let debtors = [], creditors = [];
         balancesTWD.forEach((b, i) => b < -0.1 ? debtors.push({i, amt: -b}) : (b > 0.1 ? creditors.push({i, amt: b}) : null));
+        
+        // 簡單結算邏輯
         debtors.forEach(d => {
             creditors.forEach(c => {
                 if (d.amt > 0 && c.amt > 0) {
                     let move = Math.min(d.amt, c.amt);
                     html += `<li>💸 <strong>${userNames[d.i]}</strong> ➜ <strong>${userNames[c.i]}</strong><br>
-                        應轉帳：<span class="twd-bold">NT$ ${Math.round(move).toLocaleString()}</span></li>`;
+                        應支付：<span class="twd-bold">NT$ ${Math.round(move).toLocaleString()}</span></li>`;
                     d.amt -= move; c.amt -= move;
                 }
             });
         });
+        
         document.getElementById('settlementDetail').innerHTML = records.length ? html + '</ul>' : "目前無記帳數據。";
         document.querySelectorAll('.label-name').forEach((el, idx) => el.innerText = userNames[idx % 3]);
     }
 
     function copyShareUrl() {
+        if(records.length === 0) return alert("目前沒有資料可以分享喔！");
+        
         const data = { r: records, n: userNames, rt: rate };
-        const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-        const shareUrl = `${window.location.origin}${window.location.pathname}?data=${base64Data}`;
-        const el = document.createElement('textarea'); el.value = shareUrl; document.body.appendChild(el); el.select();
-        document.execCommand('copy'); document.body.removeChild(el);
-        alert("分享網址已複製！傳給旅伴點開即可同步。");
+        try {
+            // 使用 Base64 編碼資料
+            const jsonStr = JSON.stringify(data);
+            const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
+            const shareUrl = `${window.location.origin}${window.location.pathname}?data=${base64Data}`;
+            
+            // 複製到剪貼簿
+            const el = document.createElement('textarea');
+            el.value = shareUrl;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            alert("分享網址已複製！\n對方點開網址即可看到您輸入的帳務資料。");
+        } catch(e) {
+            alert("資料量過大，建議先刪除部分舊紀錄再分享。");
+        }
     }
 
     function exportToSheet() {
-        let csv = `日期\\t項目\\t分類\\t台幣金額\\n`;
-        records.forEach(r => csv += `${r.date}\\t${r.name}\\t${r.cat}\\t${Math.round(r.totalTWD)}\\n`);
+        let csv = `日期\t項目\t分類\t台幣金額\n`;
+        records.forEach(r => csv += `${r.date}\t${r.name}\t${r.cat}\t${Math.round(r.totalTWD)}\n`);
         const el = document.createElement('textarea'); el.value = csv; document.body.appendChild(el); el.select();
         document.execCommand('copy'); document.body.removeChild(el);
-        alert("已複製表格格式，請在 Excel 貼上。");
+        alert("已複製表格格式。");
     }
 
     function deleteRecord(id) { if(confirm("確定刪除？")) { records = records.filter(r => r.id !== id); saveAndRender(); } }
