@@ -1,0 +1,6 @@
+{
+  "name": "Gmail 信用卡帳單分析助手",
+  "description": "自動整理 Gmail 中的信用卡帳單，分析消費區塊並提供財務洞察。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
